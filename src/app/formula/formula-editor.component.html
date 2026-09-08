@@ -1,0 +1,70 @@
+<div class="fe-root">
+  <div class="fe-editor" [class.fe-invalid]="hasErrors">
+    <!-- Syntax highlight layer (rendered behind the transparent input) -->
+    <div class="fe-highlight" aria-hidden="true"><span
+        *ngFor="let seg of highlightSegments; trackBy: trackByIndex"
+        [class]="seg.cls">{{ seg.text }}</span></div>
+
+    <input
+      #input
+      type="text"
+      class="fe-input"
+      spellcheck="false"
+      autocomplete="off"
+      autocapitalize="off"
+      [attr.placeholder]="placeholder"
+      [disabled]="isDisabled"
+      (input)="onInput()"
+      (keydown)="onKeydown($event)"
+      (keyup)="onCaretMove()"
+      (click)="onCaretMove()"
+      (blur)="onBlur()"
+    />
+  </div>
+
+  <!-- Argument hint (Excel-style function signature tooltip) -->
+  <div class="fe-arg-hint" *ngIf="context?.activeFunction as fn">
+    <div class="fe-arg-signature">
+      <span class="fe-fn-name">{{ fn.name }}</span>
+      <span class="fe-paren">(</span>
+      <ng-container *ngFor="let part of argHintParts; let i = index; let last = last">
+        <span class="fe-param" [class.active]="part.active">{{ part.text }}</span
+        ><span class="fe-comma" *ngIf="!last">, </span>
+      </ng-container>
+      <span class="fe-paren">)</span>
+    </div>
+    <div class="fe-fn-summary">{{ fn.summary }}</div>
+    <div class="fe-param-desc" *ngIf="activeParamDescription">{{ activeParamDescription }}</div>
+  </div>
+
+  <!-- Autocomplete dropdown -->
+  <ul class="fe-suggestions" *ngIf="showSuggestions">
+    <li
+      *ngFor="let s of suggestions; let i = index; trackBy: trackByIndex"
+      class="fe-suggestion"
+      [class.active]="i === activeSuggestion"
+      (mousedown)="applySuggestion(s)"
+      (mouseenter)="onSuggestionHover(i)"
+    >
+      <span class="fe-badge" [class.fe-badge-fn]="s.kind === 'function'" [class.fe-badge-field]="s.kind === 'field'">
+        {{ s.kind === 'function' ? 'ƒ' : 'x' }}
+      </span>
+      <span class="fe-suggestion-main">
+        <span class="fe-suggestion-name">{{ s.name }}</span>
+        <span class="fe-suggestion-detail">{{ s.detail }}</span>
+      </span>
+      <span class="fe-suggestion-category" *ngIf="s.category">{{ s.category }}</span>
+    </li>
+  </ul>
+
+  <!-- Diagnostics list -->
+  <ul class="fe-diagnostics" *ngIf="diagnostics.length > 0">
+    <li *ngFor="let d of errorDiagnostics" class="fe-diagnostic" [class.warning]="d.severity === 'warning'">
+      <span class="fe-diag-icon">{{ d.severity === 'error' ? '✕' : '!' }}</span>
+      {{ d.message }}
+    </li>
+  </ul>
+  <div class="fe-valid" *ngIf="value && diagnostics.length === 0">
+    <span class="fe-diag-icon ok">✓</span> Formula is valid
+  </div>
+</div>

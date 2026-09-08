@@ -1,0 +1,265 @@
+:host {
+  display: block;
+  font-family: 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  --fe-border: #cfd4dc;
+  --fe-border-focus: #3b82f6;
+  --fe-error: #dc2626;
+  --fe-warning: #d97706;
+  --fe-bg: #ffffff;
+  --fe-fn: #7c3aed;
+  --fe-field: #0f766e;
+  --fe-number: #b45309;
+  --fe-operator: #475569;
+  --fe-paren: #334155;
+}
+
+.fe-root {
+  position: relative;
+  width: 100%;
+}
+
+/* ---- Editor (input + highlight overlay) ---- */
+.fe-editor {
+  position: relative;
+  border: 1px solid var(--fe-border);
+  border-radius: 8px;
+  background: var(--fe-bg);
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.fe-editor:focus-within {
+  border-color: var(--fe-border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.fe-editor.fe-invalid {
+  border-color: var(--fe-error);
+}
+.fe-editor.fe-invalid:focus-within {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+/* Shared box metrics for input + highlight so glyphs align exactly. */
+.fe-input,
+.fe-highlight {
+  font: inherit;
+  font-size: 15px;
+  line-height: 24px;
+  letter-spacing: 0;
+  padding: 10px 12px;
+  margin: 0;
+  border: 0;
+  white-space: pre;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.fe-input {
+  position: relative;
+  display: block;
+  background: transparent;
+  color: transparent;
+  caret-color: #111827;
+  outline: none;
+  z-index: 2;
+}
+.fe-input::placeholder {
+  color: #9ca3af;
+}
+
+.fe-highlight {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  color: #111827;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ---- Token colors ---- */
+.tok-function {
+  color: var(--fe-fn);
+  font-weight: 600;
+}
+.tok-identifier {
+  color: var(--fe-field);
+}
+.tok-number {
+  color: var(--fe-number);
+}
+.tok-operator {
+  color: var(--fe-operator);
+}
+.tok-lparen,
+.tok-rparen,
+.tok-comma {
+  color: var(--fe-paren);
+}
+.tok-unknown {
+  color: var(--fe-error);
+}
+.tok-underline-error {
+  text-decoration: underline wavy var(--fe-error);
+  text-underline-offset: 3px;
+}
+.tok-underline-warning {
+  text-decoration: underline wavy var(--fe-warning);
+  text-underline-offset: 3px;
+}
+
+/* ---- Argument hint ---- */
+.fe-arg-hint {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  max-width: 520px;
+  background: #1f2937;
+  color: #f9fafb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  font-size: 13px;
+}
+.fe-arg-signature {
+  font-family: inherit;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.fe-fn-name {
+  color: #c4b5fd;
+  font-weight: 700;
+}
+.fe-param.active {
+  color: #fde047;
+  font-weight: 700;
+  text-decoration: underline;
+}
+.fe-param {
+  color: #e5e7eb;
+}
+.fe-paren,
+.fe-comma {
+  color: #9ca3af;
+}
+.fe-fn-summary {
+  color: #d1d5db;
+  line-height: 1.4;
+}
+.fe-param-desc {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fbbf24;
+}
+
+/* When both hint and dropdown show, push the dropdown below the hint. */
+.fe-arg-hint + .fe-suggestions {
+  top: calc(100% + 92px);
+}
+
+/* ---- Suggestions dropdown ---- */
+.fe-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 280px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid var(--fe-border);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.fe-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.fe-suggestion.active {
+  background: #eff6ff;
+}
+.fe-badge {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  font-style: italic;
+}
+.fe-badge-fn {
+  background: #ede9fe;
+  color: var(--fe-fn);
+}
+.fe-badge-field {
+  background: #ccfbf1;
+  color: var(--fe-field);
+  font-style: normal;
+}
+.fe-suggestion-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.fe-suggestion-name {
+  font-weight: 600;
+  color: #111827;
+  font-size: 14px;
+}
+.fe-suggestion-detail {
+  color: #6b7280;
+  font-size: 12px;
+  font-family: 'SF Mono', Menlo, monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fe-suggestion-category {
+  flex: 0 0 auto;
+  color: #9ca3af;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ---- Diagnostics ---- */
+.fe-diagnostics {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.fe-diagnostic {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--fe-error);
+  padding: 3px 0;
+}
+.fe-diagnostic.warning {
+  color: var(--fe-warning);
+}
+.fe-valid {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #16a34a;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.fe-diag-icon {
+  font-weight: 700;
+}
+.fe-diag-icon.ok {
+  color: #16a34a;
+}

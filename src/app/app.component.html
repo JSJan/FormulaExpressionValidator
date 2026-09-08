@@ -1,0 +1,47 @@
+<main class="page">
+  <header class="page-header">
+    <h1>{{ title }}</h1>
+    <p class="subtitle">
+      Excel-style formula editor for the Anvil expression language — with autocomplete,
+      live validation and function tooltips.
+    </p>
+  </header>
+
+  <section class="card">
+    <label class="field-label" for="formula">Expression</label>
+    <app-formula-editor
+      [(ngModel)]="formula"
+      [fields]="fields"
+      (validChange)="onValid($event)"
+    ></app-formula-editor>
+
+    <div class="hint">
+      Try typing a function name, or press <kbd>Ctrl</kbd>+<kbd>Space</kbd> to see suggestions.
+    </div>
+
+    <div class="examples">
+      <span class="examples-label">Examples:</span>
+      <button
+        *ngFor="let ex of examples"
+        type="button"
+        class="chip"
+        (click)="loadExample(ex)"
+      >
+        {{ ex }}
+      </button>
+    </div>
+  </section>
+
+  <section class="card output">
+    <div class="output-row">
+      <span class="output-label">Status</span>
+      <span class="badge" [class.ok]="isValid" [class.bad]="!isValid">
+        {{ isValid ? 'Valid' : 'Invalid' }}
+      </span>
+    </div>
+    <div class="output-row">
+      <span class="output-label">Value</span>
+      <code class="output-value">{{ formula || '(empty)' }}</code>
+    </div>
+  </section>
+</main>
