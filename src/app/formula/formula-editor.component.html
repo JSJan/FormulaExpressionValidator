@@ -35,6 +35,10 @@
     </div>
     <div class="fe-fn-summary">{{ fn.summary }}</div>
     <div class="fe-param-desc" *ngIf="activeParamDescription">{{ activeParamDescription }}</div>
+    <div class="fe-example" *ngIf="activeFunctionExample">
+      <span class="fe-example-label">Example</span>
+      <code class="fe-example-code">{{ activeFunctionExample }}</code>
+    </div>
   </div>
 
   <!-- Autocomplete dropdown -->

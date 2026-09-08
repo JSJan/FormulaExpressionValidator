@@ -28,6 +28,8 @@ export interface FunctionDef {
   returns: ParamType;
   /** Infix / prefix operator equivalent, if any. */
   operator?: string;
+  /** Optional hand-written usage example; auto-generated when omitted. */
+  example?: string;
 }
 
 const p = (
@@ -721,3 +723,34 @@ export const CATEGORIES: string[] = FUNCTIONS.reduce<string[]>((acc, f) => {
   if (!acc.includes(f.category)) acc.push(f.category);
   return acc;
 }, []);
+
+/** Pick a representative sample value for a numeric parameter. */
+function sampleNumber(paramName: string): string {
+  const n = paramName.toLowerCase();
+  if (n.includes('window') || n.includes('minute')) return '60';
+  if (n.includes('starthour')) return '9';
+  if (n.includes('endhour')) return '17';
+  if (n.includes('hour')) return '2';
+  if (n.includes('threshold') || n.includes('sum') || n.includes('limit')) return '100';
+  if (n.includes('exponent') || n.includes('power')) return '2';
+  if (n.includes('shift')) return '15';
+  return '1';
+}
+
+/**
+ * Return a concrete usage example for a function, e.g. `RollingSum(A, 60)`.
+ * Uses the explicit `example` when provided, otherwise builds one from the
+ * parameter types (vectors become A, B, C…; dates use Interval(); numbers use
+ * a representative literal).
+ */
+export function exampleFor(def: FunctionDef): string {
+  if (def.example) return def.example;
+  let vectorIndex = 0;
+  const args = def.params.map((param) => {
+    if (param.type === 'date') return 'Interval()';
+    if (param.type === 'number') return sampleNumber(param.name);
+    return String.fromCharCode(65 + vectorIndex++); // A, B, C, …
+  });
+  return `${def.name}(${args.join(', ')})`;
+}
+

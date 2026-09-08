@@ -13,7 +13,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { CATEGORIES, FUNCTIONS, FunctionDef } from './expression-catalog';
+import { CATEGORIES, FUNCTIONS, FunctionDef, exampleFor } from './expression-catalog';
 import { Token, tokenize } from './formula-tokenizer';
 import {
   CompletionContext,
@@ -332,6 +332,11 @@ export class FormulaEditorComponent implements AfterViewInit, OnChanges, Control
     const idx = Math.min(this.context!.activeArgIndex, fn.params.length - 1);
     const param = fn.params[idx];
     return `${param.name}: ${param.description}`;
+  }
+
+  get activeFunctionExample(): string | null {
+    const fn = this.context?.activeFunction;
+    return fn ? exampleFor(fn) : null;
   }
 
   trackByIndex(index: number): number {
